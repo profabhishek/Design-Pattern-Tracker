@@ -1,0 +1,438 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pattern Sprint Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column. Summary on top, day chips as jump links, then 14 day sections, each holding topic cards with three ticks. */
+:root {
+  --bg: #f1f4f3;
+  --surface: #ffffff;
+  --fg: #16201e;
+  --muted: #586763;
+  --line: #d6dedb;
+  --accent: #0e7468;
+  --accent-soft: #d5ece8;
+  --on-accent: #ffffff;
+  --p1: #a3401f;
+  --p1-soft: #f5e0d8;
+  --p2: #1d5aa0;
+  --p2-soft: #dce8f6;
+  --p3: #6a5a14;
+  --p3-soft: #f0e9c9;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1513;
+    --surface: #162220;
+    --fg: #e4ece9;
+    --muted: #94a69f;
+    --line: #28383a;
+    --accent: #4fd1c0;
+    --accent-soft: #1a3b37;
+    --on-accent: #0a1412;
+    --p1: #f0a07f;
+    --p1-soft: #3a2219;
+    --p2: #8db9ee;
+    --p2-soft: #19293f;
+    --p3: #e0cd74;
+    --p3-soft: #38310f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1513;
+  --surface: #162220;
+  --fg: #e4ece9;
+  --muted: #94a69f;
+  --line: #28383a;
+  --accent: #4fd1c0;
+  --accent-soft: #1a3b37;
+  --on-accent: #0a1412;
+  --p1: #f0a07f;
+  --p1-soft: #3a2219;
+  --p2: #8db9ee;
+  --p2-soft: #19293f;
+  --p3: #e0cd74;
+  --p3-soft: #38310f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 26px; line-height: 1.2; font-weight: 600; text-wrap: balance; }
+.sub { color: var(--muted); margin-top: 6px; max-width: 60ch; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* summary */
+.summary { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.sum-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pct { font-family: var(--font-mono); font-size: 34px; font-weight: 500; line-height: 1; }
+.pct small { font-size: 15px; color: var(--muted); margin-left: 4px; }
+.sum-meta { color: var(--muted); font-size: 13px; text-align: right; min-width: 0; }
+.bar { height: 8px; border-radius: 4px; background: var(--accent-soft); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+.prio { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.prio-row { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.prio-row .lab { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.prio-row .lab b { font-weight: 600; }
+.prio-row .bar.p1 { background: var(--p1-soft); } .prio-row .bar.p1 > i { background: var(--p1); }
+.prio-row .bar.p2 { background: var(--p2-soft); } .prio-row .bar.p2 > i { background: var(--p2); }
+.prio-row .bar.p3 { background: var(--p3-soft); } .prio-row .bar.p3 > i { background: var(--p3); }
+.sum-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; }
+.startbox { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.startbox input { font: inherit; font-family: var(--font-mono); font-size: 13px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+.status { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+/* day chips */
+.chips { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.chip { font: inherit; text-align: left; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 7px 8px; cursor: pointer; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.chip:hover { border-color: var(--accent); }
+.chip .d { font-weight: 600; font-size: 13px; }
+.chip .dt { font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip.done { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.chip.done .dt { color: var(--on-accent); opacity: .85; }
+.chip.today { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chip.part .d::after { content: " \2022"; color: var(--accent); }
+@media (max-width: 520px) { .chips { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* days */
+.day { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 16px; }
+.day-head { display: flex; align-items: baseline; gap: 10px 14px; flex-wrap: wrap; border-bottom: 2px solid var(--fg); padding-bottom: 8px; }
+.day-head h2 { font-size: 19px; font-weight: 600; }
+.day-head .date { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.day-head .theme { color: var(--muted); font-size: 14px; flex: 1 1 160px; min-width: 0; }
+.day-head .count { font-family: var(--font-mono); font-size: 13px; }
+.badge-today { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; background: var(--accent); color: var(--on-accent); border-radius: 4px; padding: 2px 6px; }
+.day.done .count { color: var(--accent); font-weight: 500; }
+
+.topic { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.topic.done { border-color: var(--accent); }
+.thead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.thead h3 { font-size: 17px; font-weight: 600; flex: 1 1 auto; min-width: 0; }
+.tag { font-family: var(--font-mono); font-size: 11px; font-weight: 500; border-radius: 4px; padding: 2px 6px; letter-spacing: .04em; }
+.tag.p1 { color: var(--p1); background: var(--p1-soft); }
+.tag.p2 { color: var(--p2); background: var(--p2-soft); }
+.tag.p3 { color: var(--p3); background: var(--p3-soft); }
+.all { font: inherit; font-size: 12px; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.all:hover { border-color: var(--accent); }
+.focus { color: var(--muted); font-size: 14px; max-width: 65ch; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.steps li + li { border-top: 1px dashed var(--line); }
+.steps label { display: flex; gap: 12px; align-items: flex-start; padding: 9px 2px; cursor: pointer; }
+.steps input { appearance: auto; accent-color: var(--accent); width: 20px; height: 20px; margin: 1px 0 0; flex: none; cursor: pointer; }
+.steps .t { min-width: 0; }
+.steps .t b { font-weight: 600; margin-right: 4px; }
+.steps input:checked + .t { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.steps input:checked + .t b { color: var(--accent); }
+.extra { background: var(--surface); border: 1px dashed var(--accent); border-radius: 8px; padding: 6px 16px; }
+.extra .lab { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); padding-top: 8px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Pattern Sprint Tracker</h1>
+    <p class="sub">32 topics over 14 days: design patterns, resilience, distributed systems and rollout strategies. Each topic has three ticks: understand it, build it, explain it.</p>
+  </header>
+
+  <section class="summary" aria-label="Overall progress">
+    <div class="sum-top">
+      <div class="pct"><span id="pct">0</span><small>% done</small></div>
+      <div class="sum-meta"><span id="topics-done">0</span> of 32 topics complete<br><span id="steps-done">0</span> of <span id="steps-total">0</span> ticks</div>
+    </div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="overall-bar"><i id="overall-fill"></i></div>
+    <div class="prio">
+      <div class="prio-row"><div class="lab"><b>Priority 1 · Must understand</b><span class="mono" id="p1-n">0/16</span></div><div class="bar p1"><i id="p1-f"></i></div></div>
+      <div class="prio-row"><div class="lab"><b>Priority 2 · Distributed</b><span class="mono" id="p2-n">0/10</span></div><div class="bar p2"><i id="p2-f"></i></div></div>
+      <div class="prio-row"><div class="lab"><b>Priority 3 · Architecture and ops</b><span class="mono" id="p3-n">0/6</span></div><div class="bar p3"><i id="p3-f"></i></div></div>
+    </div>
+    <div class="sum-foot">
+      <label class="startbox" for="start-date">Day 1 starts <input type="date" id="start-date"></label>
+      <span class="status" id="status" role="status">Saved on this device</span>
+    </div>
+  </section>
+
+  <nav class="chips" id="chips" aria-label="Jump to day"></nav>
+  <main id="days" style="display:flex;flex-direction:column;gap:32px"></main>
+</div>
+
+<script>
+(function () {
+  var STEPS = [
+    { k: "u", label: "Understand", text: function () { return "Problem it solves, when to use it, when not to."; } },
+    { k: "b", label: "Build", text: function (t) { return t.build; } },
+    { k: "e", label: "Explain", text: function (t) { return "Be ready to explain: " + t.trade + "."; } }
+  ];
+
+  var T = {
+    singleton: { n: "Singleton", p: 1, focus: "One instance, one global access point.", build: "Write a thread-safe singleton, then replace it with dependency injection.", trade: "hidden global state, testing pain, thread safety" },
+    factory: { n: "Factory", p: 1, focus: "Hide object creation behind an interface.", build: "Payment gateway factory that returns the right client by type.", trade: "simple factory vs factory method vs abstract factory" },
+    builder: { n: "Builder", p: 1, focus: "Construct complex objects step by step.", build: "Fluent builder for an HTTP request or a SQL query object.", trade: "builder vs telescoping constructors, immutability" },
+    strategy: { n: "Strategy", p: 1, focus: "Swap algorithms at runtime behind one interface.", build: "Discount or sorting strategies chosen from config.", trade: "strategy vs if/else chains, strategy vs State" },
+    observer: { n: "Observer", p: 1, focus: "Notify subscribers when state changes.", build: "Event emitter with subscribe, unsubscribe and notify.", trade: "memory leaks, ordering, sync vs async notification" },
+    proxy: { n: "Proxy", p: 1, focus: "A stand-in that controls access to the real object.", build: "Caching or logging proxy around a service call.", trade: "proxy vs decorator vs adapter" },
+    di: { n: "Dependency Injection", p: 1, focus: "Pass dependencies in instead of creating them inside.", build: "Refactor one class to constructor injection and test it with a mock.", trade: "constructor vs setter injection, DI vs service locator" },
+    repository: { n: "Repository", p: 1, focus: "Data access behind a collection-like interface.", build: "UserRepository with an in-memory and a database version.", trade: "repository vs DAO, leaky abstractions" },
+    circuit: { n: "Circuit Breaker", p: 1, focus: "Stop calling a dependency that keeps failing.", build: "Closed, open and half-open state machine around a client.", trade: "thresholds, half-open probing, fallbacks" },
+    retry: { n: "Retry", p: 1, focus: "Retry transient failures without causing a storm.", build: "Exponential backoff with jitter and a max attempt cap.", trade: "retry only idempotent calls, retry storms" },
+    timeout: { n: "Timeout", p: 1, focus: "Never wait forever on a remote call.", build: "Add connect, read and total deadline timeouts to a client.", trade: "timeout budgets across chained calls" },
+    saga: { n: "Saga", p: 1, focus: "A distributed transaction as local steps plus compensations.", build: "Draw order, payment and inventory with a compensation for each step.", trade: "orchestration vs choreography, limits of compensation" },
+    outbox: { n: "Transactional Outbox", p: 1, focus: "Write the event in the same DB transaction as the data.", build: "Outbox table plus a poller that publishes to a queue.", trade: "at-least-once delivery, polling vs CDC" },
+    idempotency: { n: "Idempotency", p: 1, focus: "The same request twice gives the same result.", build: "Idempotency-Key handling for a payment endpoint.", trade: "key storage and TTL, concurrent duplicates" },
+    gateway: { n: "API Gateway", p: 1, focus: "A single entry point for clients.", build: "Sketch routing, auth and rate limiting for two services behind one gateway.", trade: "gateway vs BFF vs service mesh, single point of failure" },
+    cqrs: { n: "CQRS", p: 1, focus: "Separate the write model from the read model.", build: "Split one service into command handlers and query handlers.", trade: "when it is overkill, eventual consistency on the read side" },
+
+    ratelimit: { n: "Rate Limiter", p: 2, focus: "Cap how fast a client can call you.", build: "Token bucket in code, then compare with a fixed window.", trade: "token bucket vs leaky bucket vs sliding window" },
+    bulkhead: { n: "Bulkhead", p: 2, focus: "Isolate resources so one failure does not sink everything.", build: "Separate thread pools per downstream dependency.", trade: "pool sizing, bulkhead vs circuit breaker" },
+    discovery: { n: "Service Discovery", p: 2, focus: "Find service instances that come and go.", build: "Draw the registry flow for client-side and server-side discovery.", trade: "client-side vs server-side, health checks" },
+    eventual: { n: "Eventual Consistency", p: 2, focus: "Replicas converge over time, not instantly.", build: "Sketch a read-your-writes bug and two ways to fix it.", trade: "CAP theorem, conflict resolution" },
+    dlq: { n: "Dead Letter Queue", p: 2, focus: "Park messages that keep failing.", build: "Consumer that moves a message to a DLQ after N retries.", trade: "poison messages, replay, alerting" },
+    sharding: { n: "Sharding", p: 2, focus: "Split data across nodes.", build: "Pick a shard key for an orders table; compare hash and range.", trade: "hot shards, resharding, cross-shard queries" },
+    twopc: { n: "Two-Phase Commit", p: 2, focus: "Prepare, then commit, across participants.", build: "Draw both phases and the coordinator-crash failure case.", trade: "blocking on coordinator failure, why microservices avoid it" },
+    tcc: { n: "TCC (Try-Confirm-Cancel)", p: 2, focus: "Reserve first, then confirm or cancel.", build: "Seat booking flow with try, confirm and cancel steps.", trade: "no isolation, cancel must be idempotent" },
+    leader: { n: "Leader Election", p: 2, focus: "Exactly one node acts as leader.", build: "Walk through a Raft election: terms, votes, heartbeats.", trade: "split brain, quorum, leases" },
+    eventsourcing: { n: "Event Sourcing", p: 2, focus: "Store events, rebuild state by replaying them.", build: "Bank account rebuilt from events, then add a snapshot.", trade: "replay cost, snapshots, schema evolution" },
+
+    strangler: { n: "Strangler Fig", p: 3, focus: "Replace a legacy system one route at a time.", build: "Plan how one legacy endpoint moves behind a routing layer.", trade: "routing layer, data sync, when to cut over" },
+    acl: { n: "Anti-Corruption Layer", p: 3, focus: "Translate between a legacy model and a clean one.", build: "Adapter that maps a legacy model to your domain model.", trade: "who owns the translation layer, its cost" },
+    sidecar: { n: "Sidecar", p: 3, focus: "A helper process deployed beside the app.", build: "Sketch a logging or proxy sidecar next to one service.", trade: "latency overhead, lifecycle coupling, sidecar vs library" },
+    bluegreen: { n: "Blue-Green Deployment", p: 3, focus: "Two environments, switch traffic between them.", build: "Write the cutover and rollback steps, including DB migrations.", trade: "DB migrations, cost of double infrastructure" },
+    canary: { n: "Canary Release", p: 3, focus: "Send a small share of traffic to the new version first.", build: "Define metrics and rollback thresholds for 5%, 25%, 100%.", trade: "metrics, automatic rollback, sticky users" },
+    cell: { n: "Cell-Based Architecture", p: 3, focus: "Independent full copies of the stack, split by tenant or region.", build: "Draw cells, the cell router and the blast radius of one failure.", trade: "blast radius, cell routing, rebalancing" }
+  };
+
+  var DAYS = [
+    { theme: "Creational patterns", topics: ["singleton", "factory", "builder"] },
+    { theme: "Behavioural and structural", topics: ["strategy", "observer", "proxy"] },
+    { theme: "Wiring and data access", topics: ["di", "repository"] },
+    { theme: "Resilience basics", topics: ["retry", "timeout", "circuit"] },
+    { theme: "Safe APIs and read/write split", topics: ["idempotency", "gateway", "cqrs"] },
+    { theme: "Distributed transactions", topics: ["saga", "outbox"] },
+    { theme: "Priority 1 revision", topics: [], extra: ["Explain all 16 Priority 1 topics in one minute each, out loud.", "Draw Saga, Outbox and Circuit Breaker from memory.", "Answer 3 mock design questions using these patterns."] },
+    { theme: "Protecting services", topics: ["ratelimit", "bulkhead", "discovery"] },
+    { theme: "Data and messaging", topics: ["eventual", "dlq", "sharding"] },
+    { theme: "Coordination", topics: ["twopc", "tcc", "leader"] },
+    { theme: "Event sourcing and revision", topics: ["eventsourcing"], extra: ["Revise all Priority 2 topics: one-line definition and one trade-off each."] },
+    { theme: "Migration patterns", topics: ["strangler", "acl", "sidecar"] },
+    { theme: "Release and blast radius", topics: ["bluegreen", "canary", "cell"] },
+    { theme: "Final revision", topics: [], extra: ["Skim every topic once and re-tick only what you can still explain.", "Pick any 5 topics at random and explain them without notes.", "Do one end-to-end design: an order system using Saga, Outbox, Idempotency and Circuit Breaker."] }
+  ];
+
+  var LS_KEY = "pattern-sprint-tracker-v1";
+  var state = { done: {}, start: "2026-10-21" };
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (raw) { var o = JSON.parse(raw); if (o && o.done) state.done = o.done; if (o && o.start) state.start = o.start; }
+  } catch (e) {}
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function $(id) { return document.getElementById(id); }
+
+  // build day structure
+  DAYS.forEach(function (d, i) {
+    d.n = i + 1;
+    d.id = "d" + d.n;
+    d.keys = [];
+    d.topics.forEach(function (id) { STEPS.forEach(function (s) { d.keys.push(id + ":" + s.k); }); });
+    (d.extra || []).forEach(function (_, j) { d.keys.push(d.id + ":x" + j); });
+  });
+
+  function renderDays() {
+    var html = "";
+    DAYS.forEach(function (d) {
+      html += '<section class="day" id="day-' + d.n + '" data-day="' + d.n + '">';
+      html += '<div class="day-head"><h2>Day ' + d.n + '</h2><span class="date" data-date></span><span class="badge-today" data-today hidden>Today</span>';
+      html += '<span class="theme">' + esc(d.theme) + '</span><span class="count" data-count></span></div>';
+      d.topics.forEach(function (id) {
+        var t = T[id];
+        html += '<article class="topic" data-topic="' + id + '"><div class="thead"><span class="tag p' + t.p + '">P' + t.p + '</span><h3>' + esc(t.n) + '</h3>';
+        html += '<button type="button" class="all" data-all="' + id + '">Mark all</button></div>';
+        html += '<p class="focus">' + esc(t.focus) + '</p><ul class="steps">';
+        STEPS.forEach(function (s) {
+          var k = id + ":" + s.k;
+          html += '<li><label><input type="checkbox" data-k="' + k + '"><span class="t"><b>' + s.label + '.</b>' + esc(s.text(t)) + '</span></label></li>';
+        });
+        html += '</ul></article>';
+      });
+      if (d.extra) {
+        html += '<div class="extra"><div class="lab">Revision tasks</div><ul class="steps">';
+        d.extra.forEach(function (txt, j) {
+          html += '<li><label><input type="checkbox" data-k="' + d.id + ':x' + j + '"><span class="t">' + esc(txt) + '</span></label></li>';
+        });
+        html += '</ul></div>';
+      }
+      html += '</section>';
+    });
+    $("days").innerHTML = html;
+
+    var chips = "";
+    DAYS.forEach(function (d) {
+      chips += '<button type="button" class="chip" data-jump="' + d.n + '"><span class="d">Day ' + d.n + '</span><span class="dt" data-cdate></span></button>';
+    });
+    $("chips").innerHTML = chips;
+  }
+
+  function parseDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+    if (!m) return null;
+    return new Date(+m[1], +m[2] - 1, +m[3]);
+  }
+  function fmt(d) { return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" }); }
+  function fmtShort(d) { return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" }); }
+  function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+
+  function sync() {
+    var start = parseDate(state.start) || parseDate("2026-10-21");
+    var today = new Date();
+    var totalKeys = 0, doneKeys = 0, topicsDone = 0;
+    var pt = { 1: [0, 0], 2: [0, 0], 3: [0, 0] };
+
+    document.querySelectorAll("input[data-k]").forEach(function (inp) {
+      inp.checked = !!state.done[inp.getAttribute("data-k")];
+    });
+
+    document.querySelectorAll(".topic").forEach(function (el) {
+      var id = el.getAttribute("data-topic");
+      var all = STEPS.every(function (s) { return state.done[id + ":" + s.k]; });
+      el.classList.toggle("done", all);
+      var p = T[id].p;
+      pt[p][1] += 1;
+      if (all) { pt[p][0] += 1; topicsDone += 1; }
+      el.querySelector(".all").hidden = all;
+    });
+
+    DAYS.forEach(function (d) {
+      var dn = d.keys.filter(function (k) { return state.done[k]; }).length;
+      totalKeys += d.keys.length; doneKeys += dn;
+      var sec = $("day-" + d.n);
+      var date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + d.n - 1);
+      sec.querySelector("[data-date]").textContent = fmt(date);
+      sec.querySelector("[data-count]").textContent = dn + "/" + d.keys.length;
+      sec.classList.toggle("done", dn === d.keys.length);
+      sec.querySelector("[data-today]").hidden = !sameDay(date, today);
+      var chip = document.querySelector('.chip[data-jump="' + d.n + '"]');
+      chip.querySelector("[data-cdate]").textContent = fmtShort(date);
+      chip.classList.toggle("done", dn === d.keys.length);
+      chip.classList.toggle("part", dn > 0 && dn < d.keys.length);
+      chip.classList.toggle("today", sameDay(date, today));
+    });
+
+    var pct = totalKeys ? Math.round(doneKeys / totalKeys * 100) : 0;
+    $("pct").textContent = pct;
+    $("overall-fill").style.width = pct + "%";
+    $("overall-bar").setAttribute("aria-valuenow", pct);
+    $("topics-done").textContent = topicsDone;
+    $("steps-done").textContent = doneKeys;
+    $("steps-total").textContent = totalKeys;
+    [1, 2, 3].forEach(function (p) {
+      $("p" + p + "-n").textContent = pt[p][0] + "/" + pt[p][1];
+      $("p" + p + "-f").style.width = (pt[p][1] ? pt[p][0] / pt[p][1] * 100 : 0) + "%";
+    });
+    $("start-date").value = state.start;
+  }
+
+  // ---- persistence: device storage always, shared db when available
+  var ref = null, timer = null, writing = false, dirty = false, firstSnap = true;
+  function setStatus(t) { $("status").textContent = t; }
+
+  function saveLocal() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ done: state.done, start: state.start })); } catch (e) {}
+  }
+  function changed() {
+    saveLocal();
+    if (!ref) { setStatus("Saved on this device"); return; }
+    dirty = true;
+    setStatus("Saving...");
+    clearTimeout(timer);
+    timer = setTimeout(flush, 400);
+  }
+  async function flush() {
+    if (writing || !ref) return;
+    writing = true;
+    try {
+      while (dirty) {
+        dirty = false;
+        await ref.set({ done: state.done, start: state.start, updatedAt: Date.now() });
+      }
+      setStatus("Saved");
+    } catch (e) {
+      setStatus("Saved on this device only");
+    }
+    writing = false;
+  }
+
+  function hasLocal() { return Object.keys(state.done).length > 0; }
+
+  async function connect() {
+    var db = null;
+    try { db = await window.claude.use("db"); } catch (e) { db = null; }
+    if (!db) return;
+    ref = db.doc("tracker/progress");
+    ref.onSnapshot(function (snap) {
+      if (!snap.exists) {
+        if (firstSnap && hasLocal()) { dirty = true; flush(); } else { setStatus("Saved"); }
+        firstSnap = false;
+        return;
+      }
+      firstSnap = false;
+      if (snap.metadata.hasPendingWrites || writing || dirty) return;
+      var d = snap.data() || {};
+      var nd = {};
+      var src = d.done || {};
+      Object.keys(src).forEach(function (k) { if (src[k]) nd[k] = true; });
+      state.done = nd;
+      if (typeof d.start === "string" && parseDate(d.start)) state.start = d.start;
+      saveLocal();
+      sync();
+      setStatus("Saved");
+    }, function () { ref = null; setStatus("Saved on this device only"); });
+  }
+
+  // ---- events
+  document.addEventListener("change", function (e) {
+    var inp = e.target;
+    if (!inp.matches || !inp.matches("input[data-k]")) return;
+    var k = inp.getAttribute("data-k");
+    if (inp.checked) state.done[k] = true; else delete state.done[k];
+    sync(); changed();
+  });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button") : null;
+    if (!b) return;
+    var all = b.getAttribute("data-all");
+    if (all) {
+      STEPS.forEach(function (s) { state.done[all + ":" + s.k] = true; });
+      sync(); changed();
+      return;
+    }
+    var j = b.getAttribute("data-jump");
+    if (j) {
+      var el = $("day-" + j);
+      if (el) el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    }
+  });
+  $("start-date").addEventListener("change", function (e) {
+    if (parseDate(e.target.value)) { state.start = e.target.value; sync(); changed(); }
+  });
+
+  renderDays();
+  sync();
+  connect();
+})();
+</script>
+
+</body></html>
