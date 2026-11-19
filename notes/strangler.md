@@ -25,12 +25,10 @@ Strangler Fig gives **small, safe, reversible** steps.
 4. Repeat for the next endpoint.
 5. When nothing goes to legacy any more → **turn it off**. 🎉
 
-```
-          ┌──────────────── Routing layer ────────────────┐
- Client ─►│ /products/** → NEW product-service            │
-          │ /orders/**   → LEGACY monolith (for now)      │
-          │ everything else → LEGACY monolith             │
-          └───────────────────────────────────────────────┘
+```diagram
+caption: The routing layer during migration
+branch: [Client | unchanged]{muted} -> [Routing layer | API gateway / proxy]{accent} => (/products/**) [NEW product-service | already migrated]{good} ; (/orders/**) [LEGACY monolith | for now]{warn} ; (everything else) [LEGACY monolith]{warn}
+note: Move one route at a time from the legacy box to a new service. When nothing goes to legacy any more, switch it off.
 ```
 
 ## 4. Build task – move one legacy endpoint behind a routing layer

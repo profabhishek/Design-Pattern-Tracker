@@ -28,19 +28,18 @@ So: services **register** themselves in a **registry**, and others **look up** b
 
 ### Client-side discovery
 
-```
- order-service ──(1) where is payment-service?──► Registry (Eureka)
-       │        ◄──(2) [10.0.1.5, 10.0.1.6]──────┘
-       │
-       └──(3) client picks one (load balancer inside the client)──► 10.0.1.6
+```diagram
+caption: Client-side discovery
+flow: [order-service | the caller]{accent} -> (1. where is payment-service?) [Registry (Eureka) | phone book of live instances]{muted}
+flow: [order-service]{accent} <- (2. here: 10.0.1.5, 10.0.1.6) [Registry (Eureka)]{muted}
+flow: [order-service | 3. picks one itself (client-side load balancing)]{accent} -> (calls directly) [payment-service | 10.0.1.6]{good}
 ```
 
 ### Server-side discovery
 
-```
- order-service ──► Load Balancer / Router (e.g. K8s Service, AWS ALB) ──► payment instance
-                          │
-                          └── looks up registry itself
+```diagram
+caption: Server-side discovery
+flow: [order-service | just calls one name]{accent} -> [Load balancer / Router | K8s Service · AWS ALB | looks up the registry itself]{warn} -> (forwards) [payment-service | one healthy instance]{good}
 ```
 
 | | Client-side | Server-side |

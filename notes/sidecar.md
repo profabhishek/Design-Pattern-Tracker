@@ -20,14 +20,10 @@ If you write this in each app, in each language (Java, Go, Node), it's duplicate
 
 ## 3. Picture (Kubernetes pod)
 
-```
-┌───────────────────── Pod ─────────────────────┐
-│  ┌──────────────┐      ┌───────────────────┐  │
-│  │ Spring Boot  │ ───► │ Sidecar (Envoy /  │──┼──► other services
-│  │ app :8080    │      │ Fluent Bit / etc) │  │
-│  └──────────────┘      └───────────────────┘  │
-│        shared network (localhost) + volumes   │
-└───────────────────────────────────────────────┘
+```diagram
+caption: A sidecar inside one Kubernetes Pod
+flow: [Spring Boot app | :8080 · only business code]{accent} -> (localhost) [Sidecar | Envoy · Fluent Bit]{warn} -> (mTLS · retries · logs) [Other services / log store]{muted}
+note: The app and the sidecar live in the same Pod: they share localhost and folders, and start and stop together.
 ```
 
 They share **localhost** and can share **files** (volumes).

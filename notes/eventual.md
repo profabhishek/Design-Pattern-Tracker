@@ -32,10 +32,11 @@ Eventual consistency = the **A** choice.
 
 ## 4. The read-your-writes bug (build task)
 
-```
-1. User updates name to "Ravi"   → write goes to PRIMARY DB
-2. Page reloads, reads profile   → read goes to REPLICA (not updated yet!)
-3. User sees old name "Ravee" 😕 → "my save didn't work!"
+```diagram
+caption: The read-your-writes bug
+step: User saves name "Ravi" | the write goes to the PRIMARY database
+step: Page reloads and reads the profile | the read goes to a REPLICA that isn't updated yet
+step: {fail} User sees the old name "Ravee" | "My save didn't work!" — confusing, even though the data is fine
 ```
 
 ### Fix 1: Read from primary right after a write

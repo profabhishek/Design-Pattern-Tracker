@@ -26,16 +26,9 @@ You can't have one transaction across DB and Kafka. The outbox fixes this: **bot
 
 ## 3. How it works
 
-```
-┌──────────── one DB transaction ───────────┐
-│ INSERT INTO orders ...                     │
-│ INSERT INTO outbox (event_type, payload)   │
-└───────────────────────────────────────────┘
-               │
-     Poller / CDC reads outbox
-               │
-               ▼
-      Kafka topic "order-created"  →  other services
+```diagram
+caption: How the outbox works
+flow: [Your service | placeOrder()]{accent} -> (ONE transaction) [Database | orders row + outbox row]{db} -> (poller / CDC reads outbox) [Kafka | topic order-events] -> [Other services | react to the event]{good}
 ```
 
 ## 4. Spring Boot code

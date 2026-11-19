@@ -20,13 +20,9 @@ With a DLQ: retry a few times, then park it safely, alert the team, keep process
 
 ## 3. Flow
 
-```
- main topic ──► consumer ──fail──► retry 1, 2, 3 (with backoff)
-                                       │ still failing
-                                       ▼
-                               orders.DLT (dead letter topic)
-                                       │
-                            alert + inspect + fix + replay
+```diagram
+caption: How a message ends up in the DLQ
+flow: [Main topic | orders]{accent} -> [Consumer] -> (fails) [Retry 1, 2, 3 | with backoff]{warn} -> (still failing) [Dead letter topic | orders.DLT]{fail} -> [Alert and fix | then replay it]{good}
 ```
 
 ## 4. Spring Boot – Kafka (build task: move to DLQ after N retries)

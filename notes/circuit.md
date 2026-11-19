@@ -19,14 +19,11 @@ A circuit breaker **fails fast** while the dependency is sick, and gives it time
 
 ## 3. The three states (state machine)
 
-```
-          failures > threshold
- CLOSED  ───────────────────────►  OPEN
-   ▲                                 │
-   │ test calls succeed              │ wait time is over
-   │                                 ▼
-   └────────────────────────── HALF_OPEN
-            test calls fail → back to OPEN
+```diagram
+caption: The three states of a circuit breaker
+flow: [CLOSED | normal · calls go through]{good} -> (failures cross the threshold) [OPEN | calls blocked · fallback returned fast]{fail} -> (wait time is over) [HALF_OPEN | a few test calls allowed]{warn}
+title: What happens in HALF_OPEN
+branch: [HALF_OPEN]{warn} => (test calls succeed) [back to CLOSED]{good} ; (test calls fail) [back to OPEN]{fail}
 ```
 
 | State | What happens |

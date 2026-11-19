@@ -27,13 +27,10 @@ new Customer(42L, "Ravi Kumar", Status.ACTIVE, LocalDate.of(1999, 5, 12), true);
 
 ## 3. Structure
 
-```
- Your domain (clean)          ACL                      Legacy / External
- ┌──────────────┐   ┌──────────────────────┐    ┌──────────────────┐
- │ CustomerService ─►│ CustomerGateway (port) │    │                  │
- │   uses Customer  │ LegacyCustomerAdapter ─┼──► │ Old SOAP/REST API │
- └──────────────┘   │ CustomerTranslator    │    │ LegacyCustomerDto │
-                    └──────────────────────┘    └──────────────────┘
+```diagram
+caption: Where the Anti-Corruption Layer sits
+flow: [Your domain | CustomerService · LoanService | uses clean `Customer`]{accent} -> (asks the port) [Anti-Corruption Layer | CustomerGateway (port) | LegacyCustomerAdapter | CustomerTranslator]{warn} -> (old API call) [Legacy / external system | old SOAP/REST API | LegacyCustomerDto]{muted}
+note: Legacy words like `CUST_NO` and `STS_CD` never cross into your domain. Only the ACL knows them.
 ```
 
 It uses **Adapter** + **Facade** + translation (mapper).

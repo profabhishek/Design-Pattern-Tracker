@@ -28,17 +28,15 @@ Raft is a famous, easy-to-understand consensus algorithm (used in etcd, Consul, 
 
 Each node is **Follower**, **Candidate**, or **Leader**.
 
-```
-1. All nodes start as FOLLOWERS (term = 1). Leader A sends heartbeats.
-2. A crashes 💥. Followers stop getting heartbeats.
-3. Node C's random election timeout (e.g. 150–300 ms) fires first.
-   C becomes CANDIDATE, increases term → 2, votes for itself,
-   and sends "RequestVote(term 2)" to everyone.
-4. Each node votes for at most ONE candidate per term
-   (and only if the candidate's log is at least as up-to-date as its own).
-5. C gets 3 of 5 votes (majority) → C becomes LEADER for term 2.
-6. C sends heartbeats → others stay followers.
-7. If old leader A comes back, it sees term 2 > its term 1 → becomes follower.
+```diagram
+caption: A Raft election, step by step
+step: Everyone is a FOLLOWER (term 1) | leader A sends regular heartbeats
+step: {fail} A crashes | followers stop hearing heartbeats
+step: C's random timer fires first | C becomes CANDIDATE, raises the term to 2, votes for itself and asks everyone: RequestVote(term 2)
+step: Nodes vote | each node gives at most ONE vote per term, and only to a candidate whose log is at least as up to date
+step: {good} C gets 3 of 5 votes | a majority, so C is LEADER for term 2
+step: C sends heartbeats | the others stay followers
+step: Old leader A comes back | it sees term 2 > its term 1, so it quietly becomes a follower
 ```
 
 Why random timeouts? So that usually only one node starts an election at a time; otherwise votes split and they retry.
