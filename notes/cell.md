@@ -21,22 +21,10 @@ Used by AWS, Slack, DoorDash, Salesforce, etc.
 
 ## 3. Build task – draw cells, the router and blast radius
 
-```
-                   ┌──────────────────────────────┐
-  Users ─────────► │  Cell Router (thin, global)  │  tenant → cell lookup
-                   └──────┬─────────┬─────────┬───┘
-                          ▼         ▼         ▼
-                   ┌─────────┐ ┌─────────┐ ┌─────────┐
-                   │ CELL 1  │ │ CELL 2  │ │ CELL 3  │
-                   │ API     │ │ API     │ │ API     │
-                   │ Orders  │ │ Orders  │ │ Orders  │
-                   │ Payment │ │ Payment │ │ Payment │
-                   │ DB,Queue│ │ DB,Queue│ │ DB,Queue│
-                   └─────────┘ └────💥───┘ └─────────┘
-                    tenants      tenants     tenants
-                    A, B, C      D, E, F     G, H, I
-
-  Cell 2 fails → only D, E, F are affected (blast radius = 1/3).
+```diagram
+caption: Cells and their blast radius
+fan: [Cell Router | thin and global · tenant → cell lookup]{accent} ; (tenants A, B, C) [Cell 1 | API · Orders · Payment | own DB + queue]{good} ; (tenants D, E, F) [Cell 2 ✕ down | API · Orders · Payment | own DB + queue]{fail} ; (tenants G, H, I) [Cell 3 | API · Orders · Payment | own DB + queue]{good}
+note-warn: Cell 2 fails → only tenants D, E, F are affected. Blast radius = 1/3 of customers.
 ```
 
 Rules:

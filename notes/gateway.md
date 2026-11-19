@@ -24,15 +24,9 @@ The gateway handles these **common concerns in one place**:
 
 ## 3. Picture
 
-```
-Mobile / Web
-     │
-     ▼
-┌─────────────┐   /orders/**    ┌───────────────┐
-│ API Gateway │ ──────────────► │ order-service │
-│ auth, rate  │   /users/**     ├───────────────┤
-│ limit, logs │ ──────────────► │ user-service  │
-└─────────────┘                 └───────────────┘
+```diagram
+caption: One front door for all clients
+branch: [Mobile / Web]{muted} -> [API Gateway | auth · rate limit · logs]{accent} => (/orders/**) [order-service]{good} ; (/users/**) [user-service]{good}
 ```
 
 ## 4. Spring Boot – Spring Cloud Gateway

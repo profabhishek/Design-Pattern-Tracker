@@ -19,13 +19,10 @@ Blue-Green gives:
 
 ## 3. Picture
 
-```
-                 ┌──────────── Load balancer / Router ───────────┐
- Users ─────────►│  live → BLUE (v1)      (after switch → GREEN) │
-                 └───────────────┬────────────────┬──────────────┘
-                                 ▼                ▼
-                          BLUE env (v1)     GREEN env (v2)
-                                 └──── same database ────┘
+```diagram
+caption: Blue-Green at a glance
+fan: [Users → Load balancer / Router | one switch decides which colour is live]{accent} ; (100% of traffic now) [BLUE · v1 | live now]{good} ; (after the switch) [GREEN · v2 | deployed and tested, waiting]{muted} ; base: [Same database | shared by both versions]{db}
+note: To release, flip the router to GREEN. To roll back, flip it back to BLUE — it is still running.
 ```
 
 ## 4. Build task – cutover and rollback steps (with DB migrations)

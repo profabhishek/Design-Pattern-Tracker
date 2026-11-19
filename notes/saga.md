@@ -34,21 +34,19 @@ If step 3 fails → refund (undo 2) → cancel order (undo 1).
 
 ### A) Choreography – services react to each other's events (no boss)
 
-```
-Order ──OrderCreated──► Payment ──PaymentDone──► Inventory ──StockReserved──► Order(CONFIRMED)
-                                                    │
-                                              StockFailed
-                                                    ▼
-                         Payment (refund) ◄──── ──── ┘ ──► Order (CANCELLED)
+```diagram
+caption: Choreography — services react to events
+title: Happy path
+flow: [Order | created (PENDING)]{accent} -> (OrderCreated) [Payment | charges] -> (PaymentDone) [Inventory | reserves stock] -> (StockReserved) [Order ✓ | CONFIRMED]{good}
+title: If stock can't be reserved
+flow: [Inventory | out of stock]{fail} -> (StockFailed) [Payment | refunds (compensation)]{warn} -> (PaymentRefunded) [Order ✕ | CANCELLED]{fail}
 ```
 
 ### B) Orchestration – one orchestrator tells each service what to do
 
-```
-           ┌──────────── Order Saga Orchestrator ───────────┐
-           │ 1. charge  2. reserve  3. confirm  (or undo)   │
-           └──────┬──────────────┬───────────────┬──────────┘
-               Payment       Inventory         Order
+```diagram
+caption: Orchestration — one boss tells everyone what to do
+fan: [Order Saga Orchestrator | 1. charge · 2. reserve · 3. confirm (or undo in reverse)]{accent} ; (charge / refund) [Payment] ; (reserve / release) [Inventory] ; (confirm / cancel) [Order]
 ```
 
 | | Choreography | Orchestration |

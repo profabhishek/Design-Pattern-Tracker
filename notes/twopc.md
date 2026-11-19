@@ -14,27 +14,24 @@ You want **one atomic transaction** across **two or more databases/resources** �
 
 ## 3. The two phases (build task – draw both)
 
-```
-Phase 1: PREPARE (voting)
- Coordinator ──"prepare?"──► DB-A : writes changes to log, locks rows → "YES"
-             ──"prepare?"──► DB-B : writes changes to log, locks rows → "YES"
-
-Phase 2: COMMIT (decision)
- all YES → Coordinator ──"commit"──► DB-A, DB-B   (release locks)
- any NO  → Coordinator ──"rollback"─► DB-A, DB-B
+```diagram
+caption: Two-phase commit
+title: Phase 1 — PREPARE (voting)
+branch: [Coordinator]{accent} => (prepare?) [DB-A | writes to log, locks rows → YES]{good} ; (prepare?) [DB-B | writes to log, locks rows → YES]{good}
+title: Phase 2 — COMMIT (decision)
+branch: [Coordinator]{accent} => (all said YES → commit) [DB-A, DB-B | commit and release locks]{good} ; (anyone said NO → rollback) [DB-A, DB-B | undo and release locks]{fail}
 ```
 
 Important: after saying **YES**, a participant **promises** it can commit, and must **wait** for the coordinator's decision while holding locks.
 
 ## 4. The coordinator-crash failure case
 
-```
-1. Coordinator sends PREPARE → A says YES, B says YES
-2. 💥 Coordinator crashes before sending COMMIT / ROLLBACK
-3. A and B are stuck in "prepared" state:
-   - they can't commit (maybe the other said NO?)
-   - they can't rollback (maybe the coordinator decided COMMIT?)
-   - their rows stay LOCKED → other transactions wait
+```diagram
+caption: The coordinator-crash problem
+step: Coordinator sends PREPARE | A says YES, B says YES
+step: {fail} Coordinator crashes | before it sends COMMIT or ROLLBACK
+step: {warn} A and B are stuck in "prepared" | they can't commit (maybe the other said NO?) and can't roll back (maybe the decision was COMMIT?)
+step: {warn} Their rows stay LOCKED | other transactions have to wait until the coordinator comes back
 ```
 
 This is why 2PC is called a **blocking protocol**. They stay blocked until the coordinator recovers and reads its decision log. (3PC and consensus-based commit try to fix this but are complex.)
