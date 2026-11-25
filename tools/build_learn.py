@@ -4,7 +4,7 @@
 Usage:  pip install markdown pygments   then   python3 tools/build_learn.py
 
 The markdown files in notes/ are the source. Edit them, then run this script
-again. Topic order, names, priorities and days are read from index.html so the
+again. Topic order, names, priorities and days are read from patterns.html so the
 notes always match the tracker.
 """
 import html
@@ -31,7 +31,7 @@ DIAGRAM_CHARS = set("─│┌┐└┘├┤┬┴►◄▼▲━")
 
 
 def read_tracker():
-    src = (ROOT / "index.html").read_text(encoding="utf-8")
+    src = (ROOT / "patterns.html").read_text(encoding="utf-8")
     topics = {}
     for m in re.finditer(r'^\s+(\w+): \{ n: "([^"]+)", p: (\d), focus: "([^"]*)", build: "([^"]*)", trade: "([^"]*)" \}', src, re.M):
         topics[m.group(1)] = dict(id=m.group(1), n=m.group(2), p=int(m.group(3)), focus=m.group(4),
