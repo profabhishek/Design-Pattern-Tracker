@@ -1,0 +1,6 @@
+# GitHub Pages: serve the site as static files. Lesson sources are built into app/course.js, so Jekyll must not render them.
+exclude:
+  - course
+  - tools
+  - notes
+  - README.md
