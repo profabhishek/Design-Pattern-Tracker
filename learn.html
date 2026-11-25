@@ -526,7 +526,11 @@ ol.tl li.t-good b { color: var(--good); }
     <button type="button" data-size="m" aria-label="Normal text">A</button>
     <button type="button" data-size="l" aria-label="Larger text">A<span style="font-size:.75em">+</span></button>
   </div>
-  <a class="icon-btn" href="index.html" title="Open the study tracker">
+  <a class="icon-btn" href="index.html" title="Back to JavaQuest, the full interview course">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+    <span class="hide-sm">JavaQuest</span>
+  </a>
+  <a class="icon-btn" href="patterns.html" title="Open the study tracker">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
     <span class="hide-sm">Tracker</span>
   </a>
@@ -550,7 +554,7 @@ ol.tl li.t-good b { color: var(--good); }
       <button type="button" class="fchip" data-f="3" aria-pressed="false">P3</button>
     </div>
     <nav id="nav" aria-label="All topics"></nav>
-    <div class="side-foot">Ticks you make here and in the <a href="index.html">tracker</a> stay in sync on this device.</div>
+    <div class="side-foot">Ticks you make here and in the <a href="patterns.html">tracker</a> stay in sync on this device.</div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
   <main id="main" tabindex="-1"></main>
@@ -713,7 +717,7 @@ ol.tl li.t-good b { color: var(--good); }
       if (list.length) h += '<span class="dc">' + list.filter(function (t) { return ticks(t.id) === 3; }).length + '/' + list.length + ' done</span>';
       h += '</div>';
       if (!list.length) {
-        h += '<div class="revision-day"><b>Revision day.</b> No new topics. Go back over the topics before this day, explain each one out loud in a minute, and redraw the diagrams from memory in the <a href="index.html">tracker</a>.</div>';
+        h += '<div class="revision-day"><b>Revision day.</b> No new topics. Go back over the topics before this day, explain each one out loud in a minute, and redraw the diagrams from memory in the <a href="patterns.html">tracker</a>.</div>';
       } else {
         h += '<div class="cards">';
         list.forEach(function (t) {
@@ -764,7 +768,7 @@ ol.tl li.t-good b { color: var(--good); }
     if (prev) h += '<a class="pg prev" href="#/' + prev.id + '"><small>' + svg(ARROW_L, ' width="14" height="14"') + 'Previous <kbd>←</kbd></small><b>' + esc(prev.n) + '</b></a>';
     if (next) h += '<a class="pg next" href="#/' + next.id + '"><small>Next up <kbd>→</kbd>' + svg(ARROW_R, ' width="14" height="14"') + '</small><b>' + esc(next.n) + '</b></a>';
     h += '</nav>';
-    h += '<div class="end-actions"><a class="btn ghost" href="#/">All topics</a><a class="btn ghost" href="index.html">Open the tracker</a></div>';
+    h += '<div class="end-actions"><a class="btn ghost" href="#/">All topics</a><a class="btn ghost" href="patterns.html">Open the tracker</a></div>';
     return h;
   }
   function syncSteps(id) {
@@ -822,7 +826,7 @@ ol.tl li.t-good b { color: var(--good); }
     var h = '<h4>On this page</h4>';
     items.forEach(function (s) { h += '<a href="#/' + (primer ? "java-basics" : t.id) + '/' + s.id + '" data-sec="' + s.id + '">' + esc(s.t) + '</a>'; });
     h += '<div class="toc-actions"><a href="#" data-top>↑ Back to top</a>';
-    if (!primer) h += '<a href="index.html">Open in tracker</a>';
+    if (!primer) h += '<a href="patterns.html">Open in tracker</a>';
     h += '</div>';
     $("toc").innerHTML = h;
     $("layout").classList.add("has-toc");
